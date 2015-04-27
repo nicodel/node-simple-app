@@ -17,17 +17,10 @@ var server = http.createServer(app).listen(port, host, function() {
               host, port, app.get('env'));
 });
 
-// At the root of your website, we show the index.html page
-// app.get('/', function(req, res) {
-//   res.sendFile('./public/index.html')
-// });
-
 /* We add configure directive to tell express to use Jade to
    render templates */
-// app.configure(function() {
-  app.set('views', __dirname + '/public');
-  app.engine('.html', require('jade').__express);
-// });
+app.set('views', __dirname + '/public');
+app.engine('.html', require('jade').__express);
 
 // Let's define some bookmarks
 var bookmarks = []
