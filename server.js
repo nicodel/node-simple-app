@@ -1,46 +1,46 @@
-/* jslint strict: true, node: true */
+// server.js
 
-var express = require('express');
+// Generate a new instance of express server.
+var express = require('express')
+  , http = require('http');
+
 var app = express();
 
+/* This will allow Cozy to run your app smoothly but
+ it won't break other execution environment */
+var port = process.env.PORT || 9250;
+var host = process.env.HOST || "127.0.0.1";
+
+// Starts the server itself
+var server = http.createServer(app).listen(port, host, function() {
+  console.log("Server listening to %s:%d within %s environment",
+              host, port, app.get('env'));
+});
+
+// At the root of your website, we show the index.html page
+// app.get('/', function(req, res) {
+//   res.sendFile('./public/index.html')
+// });
+
+/* We add configure directive to tell express to use Jade to
+   render templates */
+// app.configure(function() {
+  app.set('views', __dirname + '/public');
+  app.engine('.html', require('jade').__express);
+// });
+
+// Let's define some bookmarks
+var bookmarks = []
+bookmarks.push({title: "Cozycloud", url: "https://cozycloud.cc"});
+bookmarks.push({title: "Cozy.io", url: "http://cozy.io"});
+bookmarks.push({title: "My Cozy", url: "http://localhost:9104/"});
+
+// We render the templates with the data
 app.get('/', function(req, res) {
-  // res.setHeader('Content-Type', 'text/plain');
-  // res.send('Vous êtes à l\'acceuil');
-  res.render('index.ejs', {name: 'Nicolas'});
+  params = {
+    "bookmarks": bookmarks
+  }
+  res.render('index.jade', params, function(err, html) {
+    res.send(html);
+  });
 });
-
-app.get('/sous-sol', function(req, res) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Vous êtes dans la cave à vins, ces bouteilles sont à moi !');
-});
-
-app.get('/etage/1/chambre', function(req, res) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hé ho, c\'est privé ici !');
-});
-
-app.get('/etage/:etagenum/chambre', function(req, res) {
-    // res.setHeader('Content-Type', 'text/plain');
-    // res.end('Vous êtes à la chambre de l\'étage n°' + req.params.etagenum);
-    res.render('index.ejs', {etage: req.params.etagenum});
-});
-
-app.get('/compter/:nombre', function(req, res) {
-    var noms = ['Robert', 'Jacques', 'David'];
-    console.log('rendering');
-    res.render('index.ejs', {compteur: req.params.nombre, noms: noms});
-});
-
-app.use(function(req, res, next) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.status(404).send('Page introuvable');
-});
-
-
-var server = app.listen(8080, function(req, res) {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('Example app listening at http://%s:%s',  host, port);
-});
-
