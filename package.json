@@ -12,6 +12,7 @@
   "dependencies": {
     "americano": "^0.4.1",
     "americano-cozy-pouchdb": "^0.3.18",
+    "body-parser": "^1.12.3",
     "browserify": "^9.0.8",
     "ejs": "^2.3.1",
     "events": "^1.0.2",
@@ -19,6 +20,7 @@
     "express": "^4.12.3",
     "jade": "^1.9.2",
     "path-extra": "^1.0.2",
+    "sqlite3": "^3.0.5",
     "superagent": "^1.2.0",
     "util": "^0.10.3"
   }
