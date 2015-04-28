@@ -1,4 +1,4 @@
- doctype 5
+doctype html
 html(lang="fr")
   head
     title My Own Bookmarks
@@ -14,9 +14,9 @@ html(lang="fr")
         input(type="submit", value="Add a new bookmark")
     ul
         - for(bookmark in bookmarks) {
-            li
-                a(href=bookmarks[bookmark].url)= bookmarks[bookmark].title
-                | &nbsp;- (
-                a(href="delete/#{bookmark}") delete
-                | )
+        li
+            a(href=bookmarks[bookmark].url)= bookmarks[bookmark].title
+            | &nbsp;- (
+            a(href="delete/#{bookmarks[bookmark].id}") delete
+            | )
         - }

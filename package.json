@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "./node_modules/.bin/supervisor server.js",
     "start": "node server.js"
   },
   "author": "",
@@ -19,9 +20,11 @@
     "exorcist": "^0.3.0",
     "express": "^4.12.3",
     "jade": "^1.9.2",
+    "mocha": "^2.2.4",
     "path-extra": "^1.0.2",
     "sqlite3": "^3.0.5",
     "superagent": "^1.2.0",
+    "supervisor": "^0.6.0",
     "util": "^0.10.3"
   }
 }
