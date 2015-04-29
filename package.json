@@ -22,7 +22,7 @@
     "jade": "^1.9.2",
     "mocha": "^2.2.4",
     "path-extra": "^1.0.2",
-    "sqlite3": "^3.0.5",
+    "pouchdb": "^3.4.0",
     "superagent": "^1.2.0",
     "supervisor": "^0.6.0",
     "util": "^0.10.3"
