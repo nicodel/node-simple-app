@@ -7,7 +7,7 @@
     "build:js:client": "./build",
     "build": "npm run build:js:client",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "./node_modules/.bin/supervisor server.js",
+    "dev": " npm run build && ./node_modules/.bin/supervisor server.js",
     "start": "node server.js"
   },
   "author": "",
