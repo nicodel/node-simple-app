@@ -1,0 +1,3 @@
+#!/bin/bash
+# browersify client/ js files
+browserify --debug -e client/app.js | exorcist public/bundle.js.map > public/bundle.js
