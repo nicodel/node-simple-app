@@ -21,6 +21,7 @@ router.get('/', function(req, res, next) {
     if (err !== null) {
       next(err);
     } else {
+      console.log('rendering', data);
       res.render('index.jade', {bookmarks: data}, function(err, html) {
         res.status(200).send(html);
       });
@@ -30,10 +31,13 @@ router.get('/', function(req, res, next) {
 
 router.post('/add', function(req, res, next) {
   'use strict';
-  var title = req.body.title;
-  var url = req.body.url;
-  Bookmark.add({title: title, url: url}, function(err) {
-    console.log('Router - add %s is %s', {title: title, url: url}, err);
+  var bookmark = {
+    _id: req.body.title,
+    url: req.body.url,
+    title: req.body.title,
+  };
+  Bookmark.add(bookmark, function(err) {
+    console.log('Router - add', bookmark);
     if (err !== null) {
       next(err);
     } else {
