@@ -27,6 +27,7 @@ router.get('/', function(req, res, next) {
     }
   });
 });
+
 router.post('/add', function(req, res, next) {
   'use strict';
   var title = req.body.title;
@@ -39,6 +40,20 @@ router.post('/add', function(req, res, next) {
       res.redirect('back');
     }
   });
-
 });
+
+router.get('/delete/:id', function(req, res, next) {
+  'use strict';
+  var id = req.params.id;
+  console.log('Router - removing', id);
+  Bookmark.remove(id, function(err) {
+    console.log('Router - remove %s - %s', id, err);
+    if (err !== null) {
+      next(err);
+    } else {
+      res.redirect('back');
+    }
+  });
+});
+
 module.exports = router;

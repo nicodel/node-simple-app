@@ -39,26 +39,22 @@ var database = function() {
   };
 
   var add = function(bookmark, callback) {
-    console.log('database.add bookmark', bookmark);
     console.log('database.add callback', callback);
     var request = "INSERT INTO 'bookmarks' (title, url) " +
       "VALUES('" + bookmark.title + "', '" + bookmark.url + "')";
     db.run(request, callback);
+  };
 
-/*    db.run(request, function(err) {
-      console.log('db.run callback', callback);
-      if (err !== null) {
-        callback(err);
-      } else {
-        console.log('Database - add ', bookmark);
-        callback();
-      }
-    }); */
+  var remove = function(id, callback) {
+    console.log('database.remove callback', callback);
+    var request = "DELETE FROM bookmarks WHERE id='" + id + "'";
+    db.run(request, callback);
   };
 
   return {
-    all:  all,
-    add:  add
+    all:    all,
+    add:    add,
+    remove: remove
   };
 
 }();
