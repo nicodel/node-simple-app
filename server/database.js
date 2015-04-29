@@ -5,7 +5,7 @@ var database = function() {
   'use strict';
 
   // Database initialization
-  var db = new PouchDB('cozy-pouch-local');
+  var db = new PouchDB('cozy-pouch-server');
   /*var initdb = "SELECT name FROM sqlite_master WHERE type='table' AND name='bookmarks'";
     db.get(initdb, function(err, rows) {
       if(err !== null) {
