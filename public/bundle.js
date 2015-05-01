@@ -51,7 +51,7 @@ module.exports = Bookmarks;
 var Database = function() {
   'use strict';
   var PouchDB = require('pouchdb');
-  var db = new PouchDB('cozy-pouch-client');
+  var db = new PouchDB('cozy-pouchdb-client');
 
   var all = function(callback) {
     db.allDocs({
@@ -96,6 +96,33 @@ var Database = function() {
       }
     });
   };
+  var db_client = 'cozy-pouchdb-client';
+  var db_server = 'http://localhost:9250/cozy-pouchdb-server';
+
+  var rep = PouchDB.replicate(db_server, db_client, {
+    live: true,
+    retry: true
+  });
+
+  rep.on('change', function(info) {
+    console.log('replication changed', info);
+  });
+  rep.on('paused', function() {
+    console.log('replication paused');
+  });
+  rep.on('active', function() {
+    console.log('replication active');
+  });
+  rep.on('denied', function(info) {
+    console.log('replication denied', info);
+  });
+  rep.on('complete', function(info) {
+    console.log('replication complete', info);
+  });
+  rep.on('error', function(err) {
+    console.log('replication error', err);
+  });
+
 
   return {
     all:    all,
