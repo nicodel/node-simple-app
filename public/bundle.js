@@ -16,18 +16,29 @@
       if (err) {
         console.log('error', err);
       } else {
-        allBookmark(function(err, res) {
+/*        allBookmark(function(err, res) {
           if (err !== null) {
             console.log('error', err);
           } else {
             console.log('new list of bookmarks', res);
             displayBookmarkList(res);
           }
-        });
+        });*/
+        reinitBookmarkList();
       }
     });
-
     return false;
+  };
+
+  var reinitBookmarkList = function() {
+    allBookmark(function(err, res) {
+      if (err !== null) {
+        console.log('error', err);
+      } else {
+        console.log('new list of bookmarks', res);
+        displayBookmarkList(res);
+      }
+    });
   };
 
   var addBookmark = function(bookmark, callback) {
@@ -58,6 +69,25 @@
     });
   };
 
+  var deleteBookmark = function(element) {
+    var bookmark = element.target.parentElement.getElementsByClassName('title')[0];
+    console.log('bookmark to delete', bookmark);
+    db.get(bookmark.id, function(err, doc) {
+      if (err) {
+        console.log('error while retreiving', err);
+      } else {
+        db.remove(doc, function(err, res) {
+          if (err) {
+            console.log('error while removing', err);
+          } else {
+            console.log('success removing', res);
+            reinitBookmarkList();
+          }
+        });
+      }
+    });
+  };
+
   var displayBookmarkList = function(bookmarks) {
     var ul = document.getElementById('bookmarks-list');
     ul.innerHTML = '';
@@ -68,13 +98,16 @@
       var a_title = document.createElement('a');
       a_title.href = bookmark.url;
       a_title.innerHTML = bookmark.title;
+      a_title.id= bookmark._id;
+      a_title.className = 'title';
       li.appendChild(a_title);
       var span1 = document.createElement('span');
       span1.innerHTML = ' - ( ';
       li.appendChild(span1);
       var a_delete = document.createElement('a');
-      a_delete.href = 'delete/' + bookmark._id;
+      a_delete.href = '#' /*'delete/' + bookmark._id*/;
       a_delete.innerHTML = 'delete';
+      a_delete.addEventListener('click', deleteBookmark);
       li.appendChild(a_delete);
       var span2 = document.createElement('span');
       span2.innerHTML = ' )';
