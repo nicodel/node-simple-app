@@ -3,10 +3,15 @@
 
 ;(function() {
   'use strict';
-  var PouchDB = require('pouchdb');
-  var db = new PouchDB('cozy-pouch-client');
 
-  document.getElementById('add-form').onsubmit = function(el) {
+  var MainView = require('./views/main');
+  var Bookmarks = require('./models/bookmarks');
+  Bookmarks.all(MainView.reinitBookmarkList);
+
+  // var PouchDB = require('pouchdb');
+  // var db = new PouchDB('cozy-pouch-client');
+
+/*  document.getElementById('add-form').onsubmit = function(el) {
     console.log('form submitted', el);
     addBookmark({
       _id: Date.now().toString(),
@@ -16,21 +21,13 @@
       if (err) {
         console.log('error', err);
       } else {
-/*        allBookmark(function(err, res) {
-          if (err !== null) {
-            console.log('error', err);
-          } else {
-            console.log('new list of bookmarks', res);
-            displayBookmarkList(res);
-          }
-        });*/
         reinitBookmarkList();
       }
     });
     return false;
-  };
+  };*/
 
-  var reinitBookmarkList = function() {
+/*  var reinitBookmarkList = function() {
     allBookmark(function(err, res) {
       if (err !== null) {
         console.log('error', err);
@@ -39,9 +36,9 @@
         displayBookmarkList(res);
       }
     });
-  };
+  };*/
 
-  var addBookmark = function(bookmark, callback) {
+/*  var addBookmark = function(bookmark, callback) {
     console.log('add', bookmark);
     db.put(bookmark, function(err) {
       if (err) {
@@ -52,9 +49,9 @@
         callback(false);
       }
     });
-  };
+  };*/
 
-  var allBookmark = function(callback) {
+/*  var allBookmark = function(callback) {
     db.allDocs({
       include_docs: true,
       attachments: true
@@ -67,9 +64,9 @@
         callback(null, res.rows);
       }
     });
-  };
+  };*/
 
-  var deleteBookmark = function(element) {
+/*  var deleteBookmark = function(element) {
     var bookmark = element.target.parentElement.getElementsByClassName('title')[0];
     console.log('bookmark to delete', bookmark);
     db.get(bookmark.id, function(err, doc) {
@@ -86,9 +83,9 @@
         });
       }
     });
-  };
+  };*/
 
-  var displayBookmarkList = function(bookmarks) {
+/*  var displayBookmarkList = function(bookmarks) {
     var ul = document.getElementById('bookmarks-list');
     ul.innerHTML = '';
     for (var i = 0; i < bookmarks.length; i++) {
@@ -105,7 +102,7 @@
       span1.innerHTML = ' - ( ';
       li.appendChild(span1);
       var a_delete = document.createElement('a');
-      a_delete.href = '#' /*'delete/' + bookmark._id*/;
+      a_delete.href = '#';
       a_delete.innerHTML = 'delete';
       a_delete.addEventListener('click', deleteBookmark);
       li.appendChild(a_delete);
@@ -114,9 +111,9 @@
       li.appendChild(span2);
       ul.appendChild(li);
     }
-  };
+  };*/
 
-  allBookmark(function(err, res) {
+/*  allBookmark(function(err, res) {
     if (err !== null) {
       console.log('error', err);
     }
@@ -124,11 +121,180 @@
       console.log('new list of bookmarks', res);
       displayBookmarkList(res);
     }
-  });
+  });*/
 
 })();
 
-},{"pouchdb":31}],2:[function(require,module,exports){
+},{"./models/bookmarks":2,"./views/main":4}],2:[function(require,module,exports){
+/* jshint strict: true, node: true */
+var db = require('./database');
+
+var Bookmarks = function() {
+  'use strict';
+
+  var all = function(callback) {
+    db.all(function(err, bookmarks) {
+      if (err !== null) {
+        console.og('error', err);
+      } else {
+        console.log('bookmarks', bookmarks);
+        callback(bookmarks);
+      }
+    });
+  };
+
+  var add = function(bookmark, callback) {
+    db.add(bookmark, callback);
+  };
+
+  var remove = function(bookmark, callback) {
+  db.remove(bookmark, callback);
+  };
+
+  return {
+    all:    all,
+    add:    add,
+    remove: remove
+  };
+}();
+
+module.exports = Bookmarks;
+
+},{"./database":3}],3:[function(require,module,exports){
+/* jshint strict: true, node: true, browser: true */
+
+var Database = function() {
+  'use strict';
+  var PouchDB = require('pouchdb');
+  var db = new PouchDB('cozy-pouch-client');
+
+  var all = function(callback) {
+    db.allDocs({
+      include_docs: true,
+      attachments: true
+    }, function(err, res) {
+      if (err) {
+        callback(err, null);
+      }
+      else {
+        console.log('got', res);
+        callback(null, res.rows);
+      }
+    });
+  };
+
+  var add = function(item, callback) {
+    db.put(item, function(err, res) {
+      if (err) {
+        console.log('Error while adding to PouchDB', err);
+        callback(err);
+      } else {
+        console.log('Successfully added to PouchDB', item._id);
+        db.get(res.id, callback);
+      }
+    });
+  };
+
+  var remove = function(item, callback) {
+    db.get(item.id, function(err, doc) {
+      if (err) {
+        console.log('error while retreiving', err);
+      } else {
+        db.remove(doc, function(err, res) {
+          if (err) {
+            console.log('error while removing', err);
+          } else {
+            console.log('success removing', res);
+            callback();
+          }
+        });
+      }
+    });
+  };
+
+  return {
+    all:    all,
+    add:    add,
+    remove: remove
+  };
+
+}();
+module.exports = Database;
+
+},{"pouchdb":34}],4:[function(require,module,exports){
+/* jshint strict: true, node: true, browser: true */
+
+var Bookmarks = require('../models/bookmarks');
+
+var MainView = function() {
+  'use strict';
+
+  document.getElementById('add-form').onsubmit = function(el) {
+    console.log('form submitted', el);
+    Bookmarks.add({
+      _id: Date.now().toString(),
+      title: document.getElementById('title').value,
+      url: document.getElementById('url').value
+    }, function(err) {
+      if (err) {
+        console.log('error', err);
+      } else {
+        reinitBookmarkList();
+      }
+    });
+    return false;
+  };
+
+  var reinitBookmarkList = function() {
+    console.log('loading bookmarks list');
+    Bookmarks.all(function(bookmarks) {
+      console.log('new list of bookmarks', bookmarks);
+      __displayBookmarkList(bookmarks);
+    });
+  };
+
+  var __displayBookmarkList = function(bookmarks) {
+    console.log('bookmarks to be displayed', bookmarks);
+    var ul = document.getElementById('bookmarks-list');
+    ul.innerHTML = '';
+    for (var i = 0; i < bookmarks.length; i++) {
+      var bookmark = bookmarks[i].doc;
+      // console.log('bookmark', bookmark, i);
+      var li = document.createElement('li');
+      var a_title = document.createElement('a');
+      a_title.href = bookmark.url;
+      a_title.innerHTML = bookmark.title;
+      a_title.id= bookmark._id;
+      a_title.className = 'title';
+      li.appendChild(a_title);
+      var span1 = document.createElement('span');
+      span1.innerHTML = ' - ( ';
+      li.appendChild(span1);
+      var a_delete = document.createElement('a');
+      a_delete.href = '#';
+      a_delete.innerHTML = 'delete';
+      a_delete.addEventListener('click', __deleteBookmark);
+      li.appendChild(a_delete);
+      var span2 = document.createElement('span');
+      span2.innerHTML = ' )';
+      li.appendChild(span2);
+      ul.appendChild(li);
+    }
+  };
+
+  var __deleteBookmark = function(element) {
+    var bookmark = element.target.parentElement.getElementsByClassName('title')[0];
+    console.log('bookmark to delete', bookmark);
+    Bookmarks.remove(bookmark, reinitBookmarkList);
+  };
+
+  return {
+    reinitBookmarkList: reinitBookmarkList
+  };
+}();
+module.exports = MainView;
+
+},{"../models/bookmarks":2}],5:[function(require,module,exports){
 "use strict";
 
 var utils = require('./utils');
@@ -924,7 +1090,7 @@ AbstractPouchDB.prototype.registerDependentDatabase =
   });
 });
 
-},{"./changes":15,"./deps/errors":21,"./deps/upsert":27,"./merge":32,"./utils":37,"events":76}],3:[function(require,module,exports){
+},{"./changes":18,"./deps/errors":24,"./deps/upsert":30,"./merge":35,"./utils":40,"events":79}],6:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -1996,7 +2162,7 @@ module.exports = HttpPouch;
 
 }).call(this,require('_process'))
 
-},{"../../deps/buffer":20,"../../deps/errors":21,"../../utils":37,"_process":77,"debug":40}],4:[function(require,module,exports){
+},{"../../deps/buffer":23,"../../deps/errors":24,"../../utils":40,"_process":80,"debug":43}],7:[function(require,module,exports){
 'use strict';
 
 var merge = require('../../merge');
@@ -2181,7 +2347,7 @@ function idbAllDocs(opts, api, idb, callback) {
 }
 
 module.exports = idbAllDocs;
-},{"../../deps/errors":21,"../../merge":32,"./idb-constants":7,"./idb-utils":8}],5:[function(require,module,exports){
+},{"../../deps/errors":24,"../../merge":35,"./idb-constants":10,"./idb-utils":11}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('../../utils');
@@ -2245,7 +2411,7 @@ function checkBlobSupport(txn, idb) {
 }
 
 module.exports = checkBlobSupport;
-},{"../../utils":37,"./idb-constants":7}],6:[function(require,module,exports){
+},{"../../utils":40,"./idb-constants":10}],9:[function(require,module,exports){
 'use strict';
 
 var utils = require('../../utils');
@@ -2608,7 +2774,7 @@ function idbBulkDocs(req, opts, api, idb, Changes, callback) {
 }
 
 module.exports = idbBulkDocs;
-},{"../../deps/errors":21,"../../utils":37,"./idb-constants":7,"./idb-utils":8}],7:[function(require,module,exports){
+},{"../../deps/errors":24,"../../utils":40,"./idb-constants":10,"./idb-utils":11}],10:[function(require,module,exports){
 'use strict';
 
 // IndexedDB requires a versioned database structure, so we use the
@@ -2635,7 +2801,7 @@ exports.META_STORE = 'meta-store';
 exports.LOCAL_STORE = 'local-store';
 // Where we detect blob support
 exports.DETECT_BLOB_SUPPORT_STORE = 'detect-blob-support';
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2882,7 +3048,7 @@ exports.openTransactionSafely = function (idb, stores, mode) {
 };
 }).call(this,require('_process'))
 
-},{"../../deps/errors":21,"../../utils":37,"./idb-constants":7,"_process":77}],9:[function(require,module,exports){
+},{"../../deps/errors":24,"../../utils":40,"./idb-constants":10,"_process":80}],12:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -3850,9 +4016,9 @@ module.exports = IdbPouch;
 
 }).call(this,require('_process'))
 
-},{"../../deps/errors":21,"../../merge":32,"../../utils":37,"./idb-all-docs":4,"./idb-blob-support":5,"./idb-bulk-docs":6,"./idb-constants":7,"./idb-utils":8,"_process":77}],10:[function(require,module,exports){
+},{"../../deps/errors":24,"../../merge":35,"../../utils":40,"./idb-all-docs":7,"./idb-blob-support":8,"./idb-bulk-docs":9,"./idb-constants":10,"./idb-utils":11,"_process":80}],13:[function(require,module,exports){
 module.exports = ['idb', 'websql'];
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var utils = require('../../utils');
@@ -4177,7 +4343,7 @@ function websqlBulkDocs(req, opts, api, db, Changes, callback) {
 
 module.exports = websqlBulkDocs;
 
-},{"../../deps/errors":21,"../../utils":37,"./websql-constants":12,"./websql-utils":13}],12:[function(require,module,exports){
+},{"../../deps/errors":24,"../../utils":40,"./websql-constants":15,"./websql-utils":16}],15:[function(require,module,exports){
 'use strict';
 
 function quote(str) {
@@ -4201,7 +4367,7 @@ exports.META_STORE = quote('metadata-store');
 exports.ATTACH_AND_SEQ_STORE = quote('attach-seq-store');
 
 
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var utils = require('../../utils');
@@ -4430,7 +4596,7 @@ module.exports = {
   openDB: openDB,
   valid: valid
 };
-},{"../../deps/errors":21,"../../utils":37,"./websql-constants":12}],14:[function(require,module,exports){
+},{"../../deps/errors":24,"../../utils":40,"./websql-constants":15}],17:[function(require,module,exports){
 'use strict';
 
 var utils = require('../../utils');
@@ -5448,7 +5614,7 @@ WebSqlPouch.Changes = new utils.Changes();
 
 module.exports = WebSqlPouch;
 
-},{"../../deps/errors":21,"../../deps/parse-hex":24,"../../merge":32,"../../utils":37,"./websql-bulk-docs":11,"./websql-constants":12,"./websql-utils":13}],15:[function(require,module,exports){
+},{"../../deps/errors":24,"../../deps/parse-hex":27,"../../merge":35,"../../utils":40,"./websql-bulk-docs":14,"./websql-constants":15,"./websql-utils":16}],18:[function(require,module,exports){
 'use strict';
 var utils = require('./utils');
 var merge = require('./merge');
@@ -5704,7 +5870,7 @@ Changes.prototype.filterChanges = function (opts) {
     });
   }
 };
-},{"./deps/errors":21,"./evalFilter":29,"./evalView":30,"./merge":32,"./utils":37,"events":76}],16:[function(require,module,exports){
+},{"./deps/errors":24,"./evalFilter":32,"./evalView":33,"./merge":35,"./utils":40,"events":79}],19:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -5806,7 +5972,7 @@ Checkpointer.prototype.getCheckpoint = function () {
 
 module.exports = Checkpointer;
 
-},{"./utils":37,"pouchdb-collate":62}],17:[function(require,module,exports){
+},{"./utils":40,"pouchdb-collate":65}],20:[function(require,module,exports){
 (function (process,global){
 /*globals cordova */
 "use strict";
@@ -5980,7 +6146,7 @@ module.exports = PouchDB;
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./adapter":2,"./taskqueue":36,"./utils":37,"_process":77,"debug":40}],18:[function(require,module,exports){
+},{"./adapter":5,"./taskqueue":39,"./utils":40,"_process":80,"debug":43}],21:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -6122,7 +6288,7 @@ module.exports = ajax;
 
 }).call(this,require('_process'))
 
-},{"../utils":37,"./buffer":20,"./errors":21,"_process":77,"request":26}],19:[function(require,module,exports){
+},{"../utils":40,"./buffer":23,"./errors":24,"_process":80,"request":29}],22:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -6155,10 +6321,10 @@ module.exports = createBlob;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // hey guess what, we don't need this in the browser
 module.exports = {};
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 var inherits = require('inherits');
@@ -6420,7 +6586,7 @@ exports.generateErrorFromResponse = function (res) {
   return error;
 };
 
-},{"inherits":43}],22:[function(require,module,exports){
+},{"inherits":46}],25:[function(require,module,exports){
 (function (process,global){
 'use strict';
 
@@ -6504,7 +6670,7 @@ module.exports = function (data, callback) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":77,"crypto":75,"spark-md5":73}],23:[function(require,module,exports){
+},{"_process":80,"crypto":78,"spark-md5":76}],26:[function(require,module,exports){
 'use strict';
 
 var errors = require('./errors');
@@ -6672,7 +6838,7 @@ exports.parseDoc = function (doc, newEdits) {
   }
   return result;
 };
-},{"./errors":21,"./uuid":28}],24:[function(require,module,exports){
+},{"./errors":24,"./uuid":31}],27:[function(require,module,exports){
 'use strict';
 
 //
@@ -6740,7 +6906,7 @@ function parseHexString(str, encoding) {
 }
 
 module.exports = parseHexString;
-},{}],25:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 // originally parseUri 1.2.2, now patched by us
@@ -6786,7 +6952,7 @@ function parseUri(str) {
 
 
 module.exports = parseUri;
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var createBlob = require('./blob.js');
@@ -6895,7 +7061,7 @@ module.exports = function(options, callback) {
   return {abort: abortReq};
 };
 
-},{"../utils":37,"./blob.js":19}],27:[function(require,module,exports){
+},{"../utils":40,"./blob.js":22}],30:[function(require,module,exports){
 'use strict';
 
 var upsert = require('pouchdb-upsert').upsert;
@@ -6904,7 +7070,7 @@ module.exports = function (db, doc, diffFun, cb) {
   return upsert.call(db, doc, diffFun, cb);
 };
 
-},{"pouchdb-upsert":72}],28:[function(require,module,exports){
+},{"pouchdb-upsert":75}],31:[function(require,module,exports){
 "use strict";
 
 // BEGIN Math.uuid.js
@@ -6989,7 +7155,7 @@ function uuid(len, radix) {
 module.exports = uuid;
 
 
-},{}],29:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 module.exports = evalFilter;
@@ -7001,7 +7167,7 @@ function evalFilter(input) {
     ' })()'
   ].join(''));
 }
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 module.exports = evalView;
@@ -7023,7 +7189,7 @@ function evalView(input) {
     '})()'
   ].join('\n'));
 }
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -7053,7 +7219,7 @@ if (!process.browser) {
 
 }).call(this,require('_process'))
 
-},{"./adapters/http/http":3,"./adapters/idb/idb":9,"./adapters/leveldb/leveldb":75,"./adapters/websql/websql":14,"./deps/ajax":18,"./deps/errors":21,"./replicate":33,"./setup":34,"./sync":35,"./utils":37,"./version":38,"_process":77,"pouchdb-mapreduce":68}],32:[function(require,module,exports){
+},{"./adapters/http/http":6,"./adapters/idb/idb":12,"./adapters/leveldb/leveldb":78,"./adapters/websql/websql":17,"./deps/ajax":21,"./deps/errors":24,"./replicate":36,"./setup":37,"./sync":38,"./utils":40,"./version":41,"_process":80,"pouchdb-mapreduce":71}],35:[function(require,module,exports){
 'use strict';
 var extend = require('pouchdb-extend');
 
@@ -7355,7 +7521,7 @@ PouchMerge.rootToLeaf = function (tree) {
 
 module.exports = PouchMerge;
 
-},{"pouchdb-extend":65}],33:[function(require,module,exports){
+},{"pouchdb-extend":68}],36:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -7987,7 +8153,7 @@ function replicateWrapper(src, target, opts, callback) {
   return replicateRet;
 }
 
-},{"./checkpointer":16,"./utils":37,"events":76}],34:[function(require,module,exports){
+},{"./checkpointer":19,"./utils":40,"events":79}],37:[function(require,module,exports){
 "use strict";
 
 var PouchDB = require("./constructor");
@@ -8186,7 +8352,7 @@ PouchDB.defaults = function (defaultOpts) {
 
 module.exports = PouchDB;
 
-},{"./adapters/preferredAdapters.js":10,"./constructor":17,"./utils":37,"events":76}],35:[function(require,module,exports){
+},{"./adapters/preferredAdapters.js":13,"./constructor":20,"./utils":40,"events":79}],38:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -8372,7 +8538,7 @@ Sync.prototype.cancel = function () {
   }
 };
 
-},{"./replicate":33,"./utils":37,"events":76}],36:[function(require,module,exports){
+},{"./replicate":36,"./utils":40,"events":79}],39:[function(require,module,exports){
 'use strict';
 
 module.exports = TaskQueue;
@@ -8442,7 +8608,7 @@ TaskQueue.prototype.addTask = function (name, parameters) {
   }
 };
 
-},{}],37:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (process,global){
 /*jshint strict: false */
 /*global chrome */
@@ -9270,10 +9436,10 @@ exports.safeJsonStringify = function safeJsonStringify(json) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./deps/ajax":18,"./deps/blob":19,"./deps/buffer":20,"./deps/errors":21,"./deps/md5":22,"./deps/parse-doc":23,"./deps/parse-uri":25,"./deps/uuid":28,"./merge":32,"_process":77,"argsarray":39,"bluebird":47,"debug":40,"events":76,"inherits":43,"pouchdb-collections":64,"pouchdb-extend":65,"vuvuzela":74}],38:[function(require,module,exports){
+},{"./deps/ajax":21,"./deps/blob":22,"./deps/buffer":23,"./deps/errors":24,"./deps/md5":25,"./deps/parse-doc":26,"./deps/parse-uri":28,"./deps/uuid":31,"./merge":35,"_process":80,"argsarray":42,"bluebird":50,"debug":43,"events":79,"inherits":46,"pouchdb-collections":67,"pouchdb-extend":68,"vuvuzela":77}],41:[function(require,module,exports){
 module.exports = "3.4.0";
 
-},{}],39:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 module.exports = argsArray;
@@ -9293,7 +9459,7 @@ function argsArray(fun) {
     }
   };
 }
-},{}],40:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -9470,7 +9636,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":41}],41:[function(require,module,exports){
+},{"./debug":44}],44:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -9669,7 +9835,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":42}],42:[function(require,module,exports){
+},{"ms":45}],45:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -9794,7 +9960,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],43:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -9819,13 +9985,13 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 module.exports = INTERNAL;
 
 function INTERNAL() {}
-},{}],45:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 var Promise = require('./promise');
 var reject = require('./reject');
@@ -9869,7 +10035,7 @@ function all(iterable) {
     }
   }
 }
-},{"./INTERNAL":44,"./handlers":46,"./promise":48,"./reject":51,"./resolve":52}],46:[function(require,module,exports){
+},{"./INTERNAL":47,"./handlers":49,"./promise":51,"./reject":54,"./resolve":55}],49:[function(require,module,exports){
 'use strict';
 var tryCatch = require('./tryCatch');
 var resolveThenable = require('./resolveThenable');
@@ -9915,14 +10081,14 @@ function getThen(obj) {
     };
   }
 }
-},{"./resolveThenable":53,"./states":54,"./tryCatch":55}],47:[function(require,module,exports){
+},{"./resolveThenable":56,"./states":57,"./tryCatch":58}],50:[function(require,module,exports){
 module.exports = exports = require('./promise');
 
 exports.resolve = require('./resolve');
 exports.reject = require('./reject');
 exports.all = require('./all');
 exports.race = require('./race');
-},{"./all":45,"./promise":48,"./race":50,"./reject":51,"./resolve":52}],48:[function(require,module,exports){
+},{"./all":48,"./promise":51,"./race":53,"./reject":54,"./resolve":55}],51:[function(require,module,exports){
 'use strict';
 
 var unwrap = require('./unwrap');
@@ -9968,7 +10134,7 @@ Promise.prototype.then = function (onFulfilled, onRejected) {
   return promise;
 };
 
-},{"./INTERNAL":44,"./queueItem":49,"./resolveThenable":53,"./states":54,"./unwrap":56}],49:[function(require,module,exports){
+},{"./INTERNAL":47,"./queueItem":52,"./resolveThenable":56,"./states":57,"./unwrap":59}],52:[function(require,module,exports){
 'use strict';
 var handlers = require('./handlers');
 var unwrap = require('./unwrap');
@@ -9997,7 +10163,7 @@ QueueItem.prototype.callRejected = function (value) {
 QueueItem.prototype.otherCallRejected = function (value) {
   unwrap(this.promise, this.onRejected, value);
 };
-},{"./handlers":46,"./unwrap":56}],50:[function(require,module,exports){
+},{"./handlers":49,"./unwrap":59}],53:[function(require,module,exports){
 'use strict';
 var Promise = require('./promise');
 var reject = require('./reject');
@@ -10038,7 +10204,7 @@ function race(iterable) {
     });
   }
 }
-},{"./INTERNAL":44,"./handlers":46,"./promise":48,"./reject":51,"./resolve":52}],51:[function(require,module,exports){
+},{"./INTERNAL":47,"./handlers":49,"./promise":51,"./reject":54,"./resolve":55}],54:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./promise');
@@ -10050,7 +10216,7 @@ function reject(reason) {
 	var promise = new Promise(INTERNAL);
 	return handlers.reject(promise, reason);
 }
-},{"./INTERNAL":44,"./handlers":46,"./promise":48}],52:[function(require,module,exports){
+},{"./INTERNAL":47,"./handlers":49,"./promise":51}],55:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./promise');
@@ -10085,7 +10251,7 @@ function resolve(value) {
       return EMPTYSTRING;
   }
 }
-},{"./INTERNAL":44,"./handlers":46,"./promise":48}],53:[function(require,module,exports){
+},{"./INTERNAL":47,"./handlers":49,"./promise":51}],56:[function(require,module,exports){
 'use strict';
 var handlers = require('./handlers');
 var tryCatch = require('./tryCatch');
@@ -10118,13 +10284,13 @@ function safelyResolveThenable(self, thenable) {
   }
 }
 exports.safely = safelyResolveThenable;
-},{"./handlers":46,"./tryCatch":55}],54:[function(require,module,exports){
+},{"./handlers":49,"./tryCatch":58}],57:[function(require,module,exports){
 // Lazy man's symbols for states
 
 exports.REJECTED = ['REJECTED'];
 exports.FULFILLED = ['FULFILLED'];
 exports.PENDING = ['PENDING'];
-},{}],55:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 module.exports = tryCatch;
@@ -10140,7 +10306,7 @@ function tryCatch(func, value) {
   }
   return out;
 }
-},{}],56:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 var immediate = require('immediate');
@@ -10162,7 +10328,7 @@ function unwrap(promise, func, value) {
     }
   });
 }
-},{"./handlers":46,"immediate":57}],57:[function(require,module,exports){
+},{"./handlers":49,"immediate":60}],60:[function(require,module,exports){
 'use strict';
 var types = [
   require('./nextTick'),
@@ -10220,7 +10386,7 @@ function immediate(task) {
     scheduleDrain();
   }
 }
-},{"./messageChannel":58,"./mutation.js":59,"./nextTick":75,"./stateChange":60,"./timeout":61}],58:[function(require,module,exports){
+},{"./messageChannel":61,"./mutation.js":62,"./nextTick":78,"./stateChange":63,"./timeout":64}],61:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -10242,7 +10408,7 @@ exports.install = function (func) {
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 (function (global){
 'use strict';
 //based off rsvp https://github.com/tildeio/rsvp.js
@@ -10268,7 +10434,7 @@ exports.install = function (handle) {
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -10296,7 +10462,7 @@ exports.install = function (handle) {
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 exports.test = function () {
   return true;
@@ -10307,7 +10473,7 @@ exports.install = function (t) {
     setTimeout(t, 0);
   };
 };
-},{}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 var MIN_MAGNITUDE = -324; // verified by -Number.MIN_VALUE
@@ -10662,7 +10828,7 @@ function numToIndexableString(num) {
   return result;
 }
 
-},{"./utils":63}],63:[function(require,module,exports){
+},{"./utils":66}],66:[function(require,module,exports){
 'use strict';
 
 function pad(str, padWith, upToLength) {
@@ -10733,7 +10899,7 @@ exports.intToDecimalForm = function (int) {
 
   return result;
 };
-},{}],64:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 exports.Map = LazyMap; // TODO: use ES6 map
 exports.Set = LazySet; // TODO: use ES6 set
@@ -10805,7 +10971,7 @@ LazySet.prototype.delete = function (key) {
   return this.store.delete(key);
 };
 
-},{}],65:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 
 // Extends method
@@ -10986,7 +11152,7 @@ module.exports = extend;
 
 
 
-},{}],66:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 var upsert = require('./upsert');
@@ -11065,7 +11231,7 @@ module.exports = function (opts) {
   });
 };
 
-},{"./upsert":70,"./utils":71}],67:[function(require,module,exports){
+},{"./upsert":73,"./utils":74}],70:[function(require,module,exports){
 'use strict';
 
 module.exports = function (func, emit, sum, log, isArray, toJSON) {
@@ -11073,7 +11239,7 @@ module.exports = function (func, emit, sum, log, isArray, toJSON) {
   return eval("'use strict'; (" + func.replace(/;\s*$/, "") + ");");
 };
 
-},{}],68:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -11948,7 +12114,7 @@ function BuiltInError(message) {
 utils.inherits(BuiltInError, Error);
 }).call(this,require('_process'))
 
-},{"./create-view":66,"./evalfunc":67,"./taskqueue":69,"./utils":71,"_process":77,"pouchdb-collate":62}],69:[function(require,module,exports){
+},{"./create-view":69,"./evalfunc":70,"./taskqueue":72,"./utils":74,"_process":80,"pouchdb-collate":65}],72:[function(require,module,exports){
 'use strict';
 /*
  * Simple task queue to sequentialize actions. Assumes callbacks will eventually fire (once).
@@ -11973,7 +12139,7 @@ TaskQueue.prototype.finish = function () {
 
 module.exports = TaskQueue;
 
-},{"./utils":71}],70:[function(require,module,exports){
+},{"./utils":74}],73:[function(require,module,exports){
 'use strict';
 
 var upsert = require('pouchdb-upsert').upsert;
@@ -11981,7 +12147,7 @@ var upsert = require('pouchdb-upsert').upsert;
 module.exports = function (db, doc, diffFun) {
   return upsert.apply(db, [doc, diffFun]);
 };
-},{"pouchdb-upsert":72}],71:[function(require,module,exports){
+},{"pouchdb-upsert":75}],74:[function(require,module,exports){
 (function (process,global){
 'use strict';
 /* istanbul ignore if */
@@ -12091,7 +12257,7 @@ exports.MD5 = function (string) {
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":77,"argsarray":39,"crypto":75,"inherits":43,"lie":47,"pouchdb-extend":65,"spark-md5":73}],72:[function(require,module,exports){
+},{"_process":80,"argsarray":42,"crypto":78,"inherits":46,"lie":50,"pouchdb-extend":68,"spark-md5":76}],75:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -12199,7 +12365,7 @@ if (typeof window !== 'undefined' && window.PouchDB) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"lie":47}],73:[function(require,module,exports){
+},{"lie":50}],76:[function(require,module,exports){
 /*jshint bitwise:false*/
 /*global unescape*/
 
@@ -12800,7 +12966,7 @@ if (typeof window !== 'undefined' && window.PouchDB) {
     return SparkMD5;
 }));
 
-},{}],74:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict';
 
 /**
@@ -12975,9 +13141,9 @@ exports.parse = function (str) {
   }
 };
 
-},{}],75:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 
-},{}],76:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13280,7 +13446,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],77:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
