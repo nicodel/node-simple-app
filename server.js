@@ -1,22 +1,21 @@
 /* jshint strict: true, node: true */
 
 // Generate a new instance of express server.
-var express = require('express');
 var http = require('http');
-var bodyParser = require('body-parser');
-
-var database = require('./server/database');
-
+var express = require('express');
 var app = express();
+var PouchDB = require('pouchdb');
+
 var routes = require('./server/routes');
 
 app.use('/', routes);
+app.use('/db', require('express-pouchdb')(PouchDB));
 
 /* We add configure directive to tell express to use Jade to
    render templates */
 app.set('views', __dirname + '/server/views');
 app.engine('.html', require('jade').__express);
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
 

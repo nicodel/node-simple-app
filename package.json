@@ -21,6 +21,7 @@
     "events": "^1.0.2",
     "exorcist": "^0.3.0",
     "express": "^4.12.3",
+    "express-pouchdb": "^0.14.0",
     "jade": "^1.9.2",
     "mocha": "^2.2.4",
     "path-extra": "^1.0.2",

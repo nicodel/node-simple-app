@@ -49,9 +49,9 @@ var Database = function() {
     });
   };
   var db_client = 'cozy-pouchdb-client';
-  var db_server = 'http://localhost:9250/cozy-pouchdb-server';
+  var db_server = 'http://localhost:9250/db';
 
-  var rep = PouchDB.replicate(db_server, db_client, {
+  var rep = PouchDB.sync(db_server, db_client, {
     live: true,
     retry: true
   });
