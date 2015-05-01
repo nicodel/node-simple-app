@@ -17,7 +17,10 @@ router.use(bodyParser.urlencoded({extended: true}));
 
 router.get('/', function(req, res, next) {
   'use strict';
-  Bookmark.all(function(err, data) {
+  res.render('index.jade', function(err, html) {
+    res.status(200).send(html);
+  });
+/*  Bookmark.all(function(err, data) {
     if (err !== null) {
       next(err);
     } else {
@@ -26,7 +29,7 @@ router.get('/', function(req, res, next) {
         res.status(200).send(html);
       });
     }
-  });
+  });*/
 });
 
 router.post('/add', function(req, res, next) {

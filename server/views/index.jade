@@ -12,7 +12,7 @@ html(lang="fr")
         label Url:
         input(type="text", id="url")
         input(type="submit", id="btn-add", value="Add a new bookmark")
-    ul
+    ul(id="bookmarks-list")
         - for(bookmark in bookmarks) {
         li
             a(href=bookmarks[bookmark].doc.url)= bookmarks[bookmark].doc.title
@@ -20,4 +20,4 @@ html(lang="fr")
             a(href="delete/#{bookmarks[bookmark].id}") delete
             | )
         - }
-    script(type='text/javascript')(src='bundle.js')
+    script(type='text/javascript' src='bundle.js')
