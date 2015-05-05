@@ -3,10 +3,10 @@
 var Database = function() {
   'use strict';
   var PouchDB = require('pouchdb');
-  var db = new PouchDB('cozy-pouchdb-client');
+  var localDB = new PouchDB('cozy-pouchdb-client');
 
   var all = function(callback) {
-    db.allDocs({
+    localDB.allDocs({
       include_docs: true,
       attachments: true
     }, function(err, res) {
@@ -21,23 +21,23 @@ var Database = function() {
   };
 
   var add = function(item, callback) {
-    db.put(item, function(err, res) {
+    localDB.put(item, function(err, res) {
       if (err) {
         console.log('Error while adding to PouchDB', err);
         callback(err);
       } else {
         console.log('Successfully added to PouchDB', item._id);
-        db.get(res.id, callback);
+        localDB.get(res.id, callback);
       }
     });
   };
 
   var remove = function(item, callback) {
-    db.get(item.id, function(err, doc) {
+    localDB.get(item.id, function(err, doc) {
       if (err) {
         console.log('error while retreiving', err);
       } else {
-        db.remove(doc, function(err, res) {
+        localDB.remove(doc, function(err, res) {
           if (err) {
             console.log('error while removing', err);
           } else {
@@ -48,11 +48,20 @@ var Database = function() {
       }
     });
   };
-  var db_client = 'cozy-pouchdb-client';
-  var db_server = 'http://localhost:9250/db';
 
-  var rep = PouchDB.sync(db_server, db_client, {
+  var remoteDB = new PouchDB('http://localhost:9250/db/cozy-pouchdb');
+
+/*  localDB.sync(remoteDB, {
     live: true,
+    retry: true
+  }).on('complete', function() {
+    console.log('replicate complete');
+  }).on('error', function(err) {
+    console.log('replicate error', err);
+  });*/
+
+  var rep = localDB.sync(remoteDB, {
+    live: false,
     retry: true
   });
 
@@ -74,7 +83,6 @@ var Database = function() {
   rep.on('error', function(err) {
     console.log('replication error', err);
   });
-
 
   return {
     all:    all,

@@ -4,12 +4,13 @@
 var http = require('http');
 var express = require('express');
 var app = express();
-var PouchDB = require('pouchdb');
 
 var routes = require('./server/routes');
-
 app.use('/', routes);
+
+var PouchDB = require('pouchdb');
 app.use('/db', require('express-pouchdb')(PouchDB));
+var localDB = new PouchDB('cozy-pouchdb');
 
 /* We add configure directive to tell express to use Jade to
    render templates */
