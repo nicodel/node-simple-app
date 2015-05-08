@@ -30,5 +30,8 @@
     "superagent": "^1.2.0",
     "supervisor": "^0.6.0",
     "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "jade": "^1.9.2"
   }
 }
