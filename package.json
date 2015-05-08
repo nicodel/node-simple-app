@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "build:js:client": "./build",
-    "build": "npm run build:js:client",
+    "build:html:client": "jade server/views/index.jade --out public",
+    "build": "npm run build:js:client && npm run build:html:client",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": " npm run build && ./node_modules/.bin/supervisor server.js",
     "start": "node server.js"

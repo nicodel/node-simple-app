@@ -642,3 +642,9 @@
 [Fri, 08 May 2015 11:02:44 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_local/N_XTKlG09zSnQlVzhYhs7g%3D%3D?_nonce=1431082964057 200
 [Fri, 08 May 2015 11:02:44 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_local/xctg30KApedx4QczaLdSGw%3D%3D?_nonce=1431082964060 200
 [Fri, 08 May 2015 11:02:44 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_changes?timeout=25000&style=all_docs&since=23&limit=100&_nonce=1431082964092 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/?_nonce=1431083898974 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /?_nonce=1431083899276 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /?_nonce=1431083899275 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_local/N_XTKlG09zSnQlVzhYhs7g%3D%3D?_nonce=1431083899297 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_local/xctg30KApedx4QczaLdSGw%3D%3D?_nonce=1431083899316 200
+[Fri, 08 May 2015 11:18:19 GMT] [info] [<0.000.0>] 127.0.0.1 - - GET /cozy-pouchdb/_changes?timeout=25000&style=all_docs&since=23&limit=100&_nonce=1431083899347 200
