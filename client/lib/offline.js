@@ -257,8 +257,12 @@ simpleOffline.init = function() {
     return simpleOffline.check();
   }*/
   simpleOffline.check();
-  window.setTimeout(simpleOffline.init, 2000);
-  return true;
+/*  window.setTimeout(simpleOffline.init, 2000);
+  return true;*/
+  if (simpleOffline.getOption('reconnect')) {
+    var Reconnect = require('./reconnect');
+    Reconnect.init();
+  }
 };
 
 // setTimeout(init, 0);
