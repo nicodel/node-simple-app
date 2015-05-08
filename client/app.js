@@ -8,5 +8,6 @@
   Bookmarks.all(/*MainView.reinitBookmarkList*/);
   var offline = require('./lib/offline');
   offline.init();
+  // var timeoutID = window.setTimeout(offline.check, 1000);
 
 })();

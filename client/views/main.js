@@ -13,7 +13,19 @@ var MainView = function() {
     console.log('offline', ev);
   });*/
 
-  var xhr_status = document.getElementById('connexion-status');
+  var setStatus = function(state) {
+    var xhr_status = document.getElementById('connexion-status');
+    if (state === 'up') {
+      xhr_status.innerHTML = 'UP';
+    } else if (state === 'confirmed-up') {
+      xhr_status.innerHTML = 'CONFIRMED-UP';
+    } else if (state === 'down') {
+      xhr_status.innerHTML = 'DOWN';
+    } else if (state === 'confirmed-down') {
+      xhr_status.innerHTML = 'CONFIRMED-DOWN';
+    }
+  };
+
 
 /*  db.replicate_failed.attach(function() {
     console.log('catch failed replication attempt');
@@ -90,7 +102,8 @@ var MainView = function() {
   return {
     add_event:  add_event,
     remove_event: remove_event,
-    reinitBookmarkList: reinitBookmarkList
+    reinitBookmarkList: reinitBookmarkList,
+    setStatus:  setStatus
   };
 }();
 module.exports = MainView;

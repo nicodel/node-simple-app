@@ -62,24 +62,20 @@ simpleOffline.state = 'up';
 simpleOffline.markUp = function() {
   'use strict';
   simpleOffline.trigger('confirmed-up');
-  console.log('confirmed-up');
   if (simpleOffline.state === 'up') {
     return;
   }
   simpleOffline.state = 'up';
-  console.log('up');
   return simpleOffline.trigger('up');
 };
 
 simpleOffline.markDown = function() {
   'use strict';
   simpleOffline.trigger('confirmed-down');
-  console.log('confirmed-down');
   if (simpleOffline.state === 'down') {
     return;
   }
   simpleOffline.state = 'down';
-  console.log('down');
   return simpleOffline.trigger('down');
 };
 
@@ -97,7 +93,8 @@ simpleOffline.on = function(event, handler, ctx) {
     }
     return _results;
   } else {
-    if (handlers[event] === null) {
+    console.log('handlers[event]', handlers[event]);
+    if (handlers[event] === undefined) {
       handlers[event] = [];
     }
     return handlers[event].push([ctx, handler]);
@@ -130,6 +127,7 @@ simpleOffline.off = function(event, handler) {
 
 simpleOffline.trigger = function(event) {
   'use strict';
+  console.log('offline triggers', event);
   var ctx, handler, _i, _len, _ref, _ref1, _results;
   if (handlers[event] !== undefined) {
     _ref = handlers[event];
@@ -255,9 +253,12 @@ simpleOffline.onXHR = function(cb) {
 
 simpleOffline.init = function() {
   'use strict';
-  if (simpleOffline.getOption('checkOnLoad')) {
+/*  if (simpleOffline.getOption('checkOnLoad')) {
     return simpleOffline.check();
-  }
+  }*/
+  simpleOffline.check();
+  window.setTimeout(simpleOffline.init, 2000);
+  return true;
 };
 
 // setTimeout(init, 0);
