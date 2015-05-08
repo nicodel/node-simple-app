@@ -14,25 +14,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "americano": "^0.4.1",
-    "americano-cozy-pouchdb": "^0.3.18",
     "body-parser": "^1.12.3",
-    "browserify": "^9.0.8",
     "ejs": "^2.3.1",
-    "events": "^1.0.2",
-    "exorcist": "^0.3.0",
     "express": "^4.12.3",
     "express-pouchdb": "^0.14.0",
-    "jade": "^1.9.2",
-    "mocha": "^2.2.4",
-    "offline-js": "^0.7.11",
     "path-extra": "^1.0.2",
     "pouchdb": "^3.4.0",
-    "superagent": "^1.2.0",
-    "supervisor": "^0.6.0",
     "util": "^0.10.3"
   },
   "devDependencies": {
-    "jade": "^1.9.2"
+    "browserify": "^9.0.8",
+    "exorcist": "^0.3.0",
+    "jade": "^1.9.2",
+    "mocha": "^2.2.4",
+    "supervisor": "^0.6.0"
   }
 }
