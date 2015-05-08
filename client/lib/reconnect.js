@@ -10,30 +10,36 @@ rc.retryIntv = null;
 
 rc.reset = function() {
   'use strict';
-  var _ref;
+  // var _ref;
   if ((rc.state !== null) && rc.state !== 'inactive') {
     Offline.trigger('reconnect:stopped');
   }
   rc.state = 'inactive';
-  rc.remaining = rc.delay = (_ref = Offline.getOption('reconnect.initialDelay')) !== null ? _ref : 3;
+  // rc.remaining = rc.delay = (_ref = Offline.getOption('reconnect.initialDelay')) !== undefined ? _ref : 3;
+  rc.remaining = rc.delay = 3;
   return rc.remaining;
 };
 
 rc.next = function() {
   'use strict';
-  var delay, _ref;
-  delay = (_ref = Offline.getOption('reconnect.delay')) !== null ? _ref : Math.min(Math.ceil(rc.delay * 1.5), 3600);
+  // var delay, _ref;
+  // delay = (_ref = Offline.getOption('reconnect.delay')) !== undefined ? _ref : Math.min(Math.ceil(rc.delay * 1.5), 3600);
+  console.log('rc.delay', rc.delay);
+  var delay = Math.min(Math.ceil(rc.delay * 1.5), 3600);
   rc.remaining = rc.delay = delay;
+  console.log('rc.remaining', rc.remaining);
   return rc.remaining;
 };
 
 rc.tick = function() {
   'use strict';
+  console.log('rc.state', rc.state);
   if (rc.state === 'connecting') {
     return;
   }
   rc.remaining -= 1;
   Offline.trigger('reconnect:tick');
+  console.log('rc.remaining', rc.remaining);
   if (rc.remaining === 0) {
     return rc.tryNow();
   }
@@ -42,6 +48,7 @@ rc.tick = function() {
 rc.tryNow = function() {
   'use strict';
   if (rc.state !== 'waiting') {
+    console.log('not yet');
     return;
   }
   Offline.trigger('reconnect:connecting');
@@ -51,6 +58,7 @@ rc.tryNow = function() {
 
 rc.down = function() {
   'use strict';
+  console.log('reconnect'/*, Offline.getOption('reconnect')*/);
   if (!Offline.getOption('reconnect')) {
     return;
   }
@@ -72,6 +80,7 @@ rc.up = function() {
 rc.nope = function() {
   'use strict';
   if (!Offline.getOption('reconnect')) {
+    console.log('reconnect', Offline.getOption('reconnect'));
     return;
   }
   if (rc.state === 'connecting') {
@@ -83,7 +92,7 @@ rc.nope = function() {
 
 rc.init = function() {
   'use strict';
-  rc.tryNow = rc.tryNow;
+  // rc.tryNow = rc.tryNow;
   rc.reset();
 
   Offline.on('down', rc.down);

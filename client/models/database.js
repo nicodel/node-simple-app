@@ -1,9 +1,13 @@
 /* jshint strict: true, node: true, browser: true */
 
+
 var Database = function() {
   'use strict';
   var PouchDB = require('pouchdb');
   var localDB = new PouchDB('cozy-pouchdb-client');
+  var Ev = require('../lib/event');
+
+  var error_event = new Ev(this);
 
   var all = function(callback) {
     localDB.allDocs({
@@ -12,6 +16,7 @@ var Database = function() {
     }, function(err, res) {
       if (err) {
         callback(err, null);
+        error_event.notify({error: err});
       }
       else {
         console.log('got', res);
@@ -24,6 +29,7 @@ var Database = function() {
     localDB.put(item, function(err, res) {
       if (err) {
         console.log('Error while adding to PouchDB', err);
+        error_event.notify({error: err});
       } else {
         console.log('Successfully added to PouchDB', item._id);
         localDB.get(res.id);
@@ -37,10 +43,12 @@ var Database = function() {
     localDB.get(item.id, function(err, doc) {
       if (err) {
         console.log('error while retreiving', err);
+        error_event.notify({error: err});
       } else {
         localDB.remove(doc, function(err, res) {
           if (err) {
             console.log('error while removing', err);
+            error_event.notify({error: err});
           } else {
             console.log('success removing', res);
             callback();
@@ -59,6 +67,7 @@ var Database = function() {
       console.log('replicate complete', info);
     }).on('error', function(err) {
       console.log('replicate error', err);
+      error_event.notify({error: err});
     });
   };
 
@@ -95,9 +104,11 @@ var Database = function() {
   });
   rep.on('error', function(err) {
     console.log('replication error', err);
+    error_event.notify({error: err});
   });
 
   return {
+    error_event:  error_event,
     all:        all,
     add:        add,
     remove:     remove,

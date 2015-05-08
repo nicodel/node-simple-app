@@ -10,7 +10,12 @@ simpleOffline.options = {
     timeout: 5000
   },
   checkOnLoad: true,
-  reconnect: true
+  reconnect: true /*{
+    // How many seconds should we wait before rechecking.
+    initialDelay: 1,
+    // How long should we wait between retries.
+    delay: 1
+  }*/
 };
 
 simpleOffline.grab = function(obj, key) {

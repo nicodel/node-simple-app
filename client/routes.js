@@ -3,6 +3,7 @@
 var offline = require('./lib/offline');
 var View = require('./views/main');
 var Bookmark = require('./models/bookmarks');
+var Database = require('./models/database');
 
 var Routes = function() {
   'use strict';
@@ -13,6 +14,7 @@ var Routes = function() {
 
   offline.on('confirmed-up', function() {
     View.setStatus('confirmed-up');
+    Database.replicate();
   });
 
   offline.on('down', function() {
@@ -21,6 +23,11 @@ var Routes = function() {
 
   offline.on('confirmed-down', function() {
     View.setStatus('confirmed-down');
+  });
+
+  Database.error_event.attach(function(sender, args) {
+    console.log('Database error', args.error);
+    offline.check();
   });
 
   View.add_event.attach(function(sender, args) {
