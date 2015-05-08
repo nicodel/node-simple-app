@@ -1,13 +1,36 @@
 /* jshint strict: true, node: true, browser: true */
 
 var Bookmarks = require('../models/bookmarks');
+var Ev = require('../lib/event');
 
 var MainView = function() {
   'use strict';
 
+/*  window.addEventListener('online', function(ev) {
+    console.log('online', ev);
+  });
+  window.addEventListener('offline', function(ev) {
+    console.log('offline', ev);
+  });*/
+
+  var xhr_status = document.getElementById('connexion-status');
+
+/*  db.replicate_failed.attach(function() {
+    console.log('catch failed replication attempt');
+    xhr_status.innerHTML = 'OFFLINE';
+  });
+*/
+  var add_event = new Ev(this);
+  var remove_event = new Ev(this);
+
   document.getElementById('add-form').onsubmit = function(el) {
     console.log('form submitted', el);
-    Bookmarks.add({
+    add_event.notify({bookmark: {
+      _id: Date.now().toString(),
+      title: document.getElementById('title').value,
+      url: document.getElementById('url').value
+    }});
+/*    Bookmarks.add({
       _id: Date.now().toString(),
       title: document.getElementById('title').value,
       url: document.getElementById('url').value
@@ -17,16 +40,17 @@ var MainView = function() {
       } else {
         reinitBookmarkList();
       }
-    });
+    }); */
     return false;
   };
 
-  var reinitBookmarkList = function() {
-    console.log('loading bookmarks list');
-    Bookmarks.all(function(bookmarks) {
+  var reinitBookmarkList = function(bookmarks) {
+    console.log('loading bookmarks list', bookmarks);
+/*    Bookmarks.all(function(bookmarks) {
       console.log('new list of bookmarks', bookmarks);
       __displayBookmarkList(bookmarks);
-    });
+    }); */
+    __displayBookmarkList(bookmarks);
   };
 
   var __displayBookmarkList = function(bookmarks) {
@@ -60,10 +84,12 @@ var MainView = function() {
   var __deleteBookmark = function(element) {
     var bookmark = element.target.parentElement.getElementsByClassName('title')[0];
     console.log('bookmark to delete', bookmark);
-    Bookmarks.remove(bookmark, reinitBookmarkList);
+    remove_event.notify({bookmark: bookmark});
   };
 
   return {
+    add_event:  add_event,
+    remove_event: remove_event,
     reinitBookmarkList: reinitBookmarkList
   };
 }();

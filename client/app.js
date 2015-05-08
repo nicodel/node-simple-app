@@ -3,8 +3,10 @@
 ;(function() {
   'use strict';
 
-  var MainView = require('./views/main');
+  var Routes = require('./routes');
   var Bookmarks = require('./models/bookmarks');
-  Bookmarks.all(MainView.reinitBookmarkList);
+  Bookmarks.all(/*MainView.reinitBookmarkList*/);
+  var offline = require('./lib/offline');
+  offline.init();
 
 })();

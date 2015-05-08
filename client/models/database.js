@@ -24,12 +24,13 @@ var Database = function() {
     localDB.put(item, function(err, res) {
       if (err) {
         console.log('Error while adding to PouchDB', err);
-        callback(err);
       } else {
         console.log('Successfully added to PouchDB', item._id);
-        localDB.get(res.id, callback);
+        localDB.get(res.id);
+        callback();
       }
     });
+    replicate();
   };
 
   var remove = function(item, callback) {
@@ -46,6 +47,18 @@ var Database = function() {
           }
         });
       }
+    });
+    replicate();
+  };
+
+  var replicate = function() {
+    console.log('REPLICATE');
+    localDB.replicate.to(remoteDB, {
+      retry:false
+    }).on('complete', function(info) {
+      console.log('replicate complete', info);
+    }).on('error', function(err) {
+      console.log('replicate error', err);
     });
   };
 
@@ -85,9 +98,10 @@ var Database = function() {
   });
 
   return {
-    all:    all,
-    add:    add,
-    remove: remove
+    all:        all,
+    add:        add,
+    remove:     remove,
+    replicate:  replicate
   };
 
 }();

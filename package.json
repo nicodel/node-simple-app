@@ -24,6 +24,7 @@
     "express-pouchdb": "^0.14.0",
     "jade": "^1.9.2",
     "mocha": "^2.2.4",
+    "offline-js": "^0.7.11",
     "path-extra": "^1.0.2",
     "pouchdb": "^3.4.0",
     "superagent": "^1.2.0",
